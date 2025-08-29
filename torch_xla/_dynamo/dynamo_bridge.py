@@ -119,15 +119,6 @@ def _get_input_arg_device(input_args: tuple) -> torch.device:
     return device
 
 
-# Returns True if all the input args are on a CUDA device.
-def _args_on_cuda(input_args: tuple) -> bool:
-  input_device: torch.device = _get_input_arg_device(input_args)
-  if input_device is None:
-    return False
-
-  return input_device.type == "cuda"
-
-
 # Given an input list, moves the tensors to the given target_device.
 # The output order will be the same as the input. Non tensors will also still
 # be in the list.
@@ -802,10 +793,6 @@ def partition_fx_graph_for_cpu_fallback(xla_model, xla_args, all_xla_args,
 
 
 def extract_compiled_graph_helper(xla_model: torch.fx.GraphModule, xla_args):
-  if _args_on_cuda(xla_args):
-    xla_args = tuple(
-        _maybe_move_tensors_to_device(xla_args, torch_xla.device()))
-
   # Synchronize xla_args, so that each FunctionalTensorWrapper argument updates its
   # value reference before actually computing it.
   for a in xla_args:
