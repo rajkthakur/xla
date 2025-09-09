@@ -2531,6 +2531,18 @@ class TestAtenXlaTensor(test_utils.XlaTestCase):
           "tensor (8).")
       self.assertEqual(str(e), expected_error)
 
+  def test_trace_raises_error_on_non_matrix_input(self):
+    device = torch_xla.device()
+    a = torch.rand(2, 2, 2, device=device)
+
+    try:
+      torch.trace(a)
+    except RuntimeError as e:
+      expected_error = (
+          "trace(): expected the input tensor f32[2,2,2] to be a "
+          "matrix (i.e. a 2D tensor).")
+      self.assertEqual(str(e), expected_error)
+
 
 class MNISTComparator(nn.Module):
 
